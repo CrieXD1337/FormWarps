@@ -1,6 +1,7 @@
 name: FormWarps
 version: ${pom.version}
 main: ru.rexlite.warps.WarpMain
+api: [1.1.0]
 description: Warp system for your server with GUI.
 author: Criex
 commands:
