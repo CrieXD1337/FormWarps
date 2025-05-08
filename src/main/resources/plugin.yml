@@ -1,0 +1,26 @@
+name: FormWarps
+version: ${pom.version}
+main: ru.rexlite.warps.WarpMain
+description: Warp system for your server with GUI.
+author: Criex
+commands:
+  setwarp:
+    description: Create a warp
+    permission: formwarps.commands.setwarp
+    aliases: ["createwarp"]
+  delwarp:
+    description: Delete a warp
+    permission: formwarps.commands.delwarp
+    aliases: ["removewarp", "rmwarp"]
+  warp:
+    description: Teleport to a warp
+    permission: formwarps.commands.warp
+permissions:
+  formwarps.commands.setwarp:
+    default: op
+  formwarps.commands.delwarp:
+    default: op
+  formwarp.commands.delwarp.others:
+    default: op
+  formwarps.commands.warp:
+    default: true

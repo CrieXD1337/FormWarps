@@ -1,0 +1,21 @@
+messages:
+  # Chat messages
+  warp-usage: "§7> §cUsage: §e/warp <warp name>"
+  warp-tp-success: "§7> §fTeleported to warp §b{warp}"
+  warp-set-success: "§7> §fWarp §b{warp} §fcreated successfully!"
+  warp-exists: "§7> §cThis warp already exists!"
+  warp-not-found: "§7> §cWarp not found!"
+  warp-deleted: "§7> §fWarp §b{warp} §fdeleted successfully."
+  no-permission: "§c%commands.generic.permission"
+  name-too-short: "§7> §cWarp name must be between §e2§c and §e14§c characters."
+
+  # Forms text
+  no-warps: "You have no warps."
+  form-setwarp-title: "Create Warp Point"
+  form-setwarp-input: "Enter warp name (2-14 characters):"
+  form-deletewarp-title: "Delete Warp"
+  form-deletewarp-desc: "Select a warp to delete:"
+  form-confirm-title: "Confirm Deletion"
+  form-confirm-desc: "Delete warp {warp}?"
+  yes: "Yes"
+  no: "No"

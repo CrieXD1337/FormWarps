@@ -1,0 +1,76 @@
+package ru.rexlite.warps;
+
+import cn.nukkit.Player;
+import cn.nukkit.command.Command;
+import cn.nukkit.command.CommandSender;
+import cn.nukkit.event.Listener;
+import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.TextFormat;
+
+public class WarpMain extends PluginBase implements Listener {
+
+    public static WarpManager warpManager;
+    public static WarpFormHandler formHandler;
+    public static ConfigManager configManager;
+
+    @Override
+    public void onEnable() {
+        this.getDataFolder().mkdirs();
+        warpManager = new WarpManager(getDataFolder());
+        configManager = new ConfigManager(this);
+        formHandler = new WarpFormHandler(this);
+        getServer().getPluginManager().registerEvents(formHandler, this);
+        getLogger().info("Warp plugin successfully enabled!");
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(TextFormat.RED + "This command is only available to players.");
+            return true;
+        }
+
+        Player player = (Player) sender;
+        String cmd = command.getName().toLowerCase();
+
+        switch (cmd) {
+            case "setwarp":
+                if (!player.hasPermission("formwarps.commands.setwarp")) {
+                    player.sendMessage(configManager.msgNoPermission);
+                    return true;
+                }
+                if (args.length == 1) {
+                    formHandler.setWarp(player, args[0]);
+                } else {
+                    formHandler.showSetWarpForm(player);
+                }
+                break;
+
+            case "delwarp":
+                if (!player.hasPermission("formwarps.commands.delwarp")) {
+                    player.sendMessage(configManager.msgNoPermission);
+                    return true;
+                }
+                if (args.length == 1) {
+                    formHandler.deleteWarp(player, args[0], player.getName());
+                } else {
+                    formHandler.showDeleteWarpForm(player);
+                }
+                break;
+
+            case "warp":
+                if (!player.hasPermission("formwarps.commands.warp")) {
+                    player.sendMessage(configManager.msgNoPermission);
+                    return true;
+                }
+                if (args.length != 1) {
+                    player.sendMessage(configManager.msgWarpUsage);
+                    return true;
+                }
+                formHandler.teleportToWarp(player, args[0]);
+                break;
+        }
+
+        return true;
+    }
+}
