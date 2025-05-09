@@ -5,7 +5,7 @@
 
     <groupId>ru.rexlite.warps</groupId>
     <artifactId>FormWarps</artifactId>
-    <version>1.0</version>
+    <version>latest</version>
     <name>FormWarps</name>
 
     <properties>
