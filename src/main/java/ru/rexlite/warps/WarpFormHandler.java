@@ -43,8 +43,14 @@ public class WarpFormHandler implements Listener {
 
     public void showSetWarpForm(Player player) {
         FormWindowCustom form = new FormWindowCustom(WarpMain.configManager.formSetwarpTitle);
-        form.addElement(new ElementInput(WarpMain.configManager.formSetwarpInput, "warp"));
+        form.addElement(new ElementInput(WarpMain.configManager.formSetwarpInput, WarpMain.configManager.formTipWarp));
         player.showFormWindow(form, 1);
+    }
+
+    public void showWarpForm(Player player) {
+        FormWindowCustom form = new FormWindowCustom(WarpMain.configManager.formWarpTitle);
+        form.addElement(new ElementInput(WarpMain.configManager.formWarpInput, WarpMain.configManager.formTipWarp));
+        player.showFormWindow(form, 4);
     }
 
     public void setWarp(Player player, String warpName) {
@@ -73,7 +79,7 @@ public class WarpFormHandler implements Listener {
             form.addButton(new ElementButton(WarpMain.configManager.msgNoWarps));
         } else {
             for (String warp : warps.keySet()) {
-                form.addButton(new ElementButton(warp, new ElementButtonImageData("path", "textures/blocks/campfire")));
+                form.addButton(new ElementButton(warp, new ElementButtonImageData("path", "textures/items/campfire")));
             }
         }
         player.showFormWindow(form, 2);
@@ -119,9 +125,24 @@ public class WarpFormHandler implements Listener {
         if (event.wasClosed()) return;
 
         if (event.getWindow() instanceof FormWindowCustom) {
-            String warpName = ((FormResponseCustom) event.getResponse()).getInputResponse(0);
-            if (warpName != null && !warpName.trim().isEmpty()) {
-                setWarp(player, warpName.trim());
+            FormWindowCustom form = (FormWindowCustom) event.getWindow();
+            FormResponseCustom response = (FormResponseCustom) event.getResponse();
+            if (response == null) return;
+
+            String title = form.getTitle();
+
+            if (title.equals(WarpMain.configManager.formSetwarpTitle)) {
+                String warpName = response.getInputResponse(0);
+                if (warpName != null && !warpName.trim().isEmpty()) {
+                    setWarp(player, warpName.trim());
+                }
+            }
+
+            if (title.equals(WarpMain.configManager.formWarpTitle)) {
+                String warpName = response.getInputResponse(0);
+                if (warpName != null && !warpName.trim().isEmpty()) {
+                    teleportToWarp(player, warpName.trim());
+                }
             }
         }
 
