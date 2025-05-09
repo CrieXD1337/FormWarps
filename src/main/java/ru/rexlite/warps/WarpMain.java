@@ -43,7 +43,8 @@ public class WarpMain extends PluginBase implements Listener {
         configManager = new ConfigManager(this);
         formHandler = new WarpFormHandler(this);
         getServer().getPluginManager().registerEvents(formHandler, this);
-        getLogger().info("Warp plugin successfully enabled!");
+        getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "successfully enabled!");
+        getLogger().info(TextFormat.DARK_AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
     }
 
     @Override
@@ -86,11 +87,11 @@ public class WarpMain extends PluginBase implements Listener {
                     player.sendMessage(configManager.msgNoPermission);
                     return true;
                 }
-                if (args.length != 1) {
-                    player.sendMessage(configManager.msgWarpUsage);
-                    return true;
+                if (args.length == 1) {
+                    formHandler.teleportToWarp(player, args[0]);
+                } else {
+                    formHandler.showWarpForm(player);
                 }
-                formHandler.teleportToWarp(player, args[0]);
                 break;
         }
 
