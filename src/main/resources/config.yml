@@ -17,5 +17,6 @@ messages:
   form-deletewarp-desc: "Select a warp to delete:"
   form-confirm-title: "Confirm Deletion"
   form-confirm-desc: "Delete warp {warp}?"
-  yes: "Yes"
-  no: "No"
+  form-warp-tip: "warp name"
+  yes: "§2Yes"
+  no: "§cNo"
