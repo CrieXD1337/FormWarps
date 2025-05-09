@@ -26,12 +26,11 @@ package ru.rexlite.warps;
 import cn.nukkit.utils.Config;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class WarpManager {
 
-    private final Map<String, Map<String, double[]>> warps = new HashMap<>();
+    private final Map<String, Map<String, List<Double>>> warps = new HashMap<>();
     private final Config config;
 
     public WarpManager(File dataFolder) {
@@ -42,18 +41,33 @@ public class WarpManager {
     @SuppressWarnings("unchecked")
     private void loadWarps() {
         for (String player : config.getKeys(false)) {
-            warps.put(player, (Map<String, double[]>) config.get(player));
+            Object raw = config.get(player);
+            if (raw instanceof Map) {
+                Map<String, Object> playerData = (Map<String, Object>) raw;
+                Map<String, List<Double>> playerWarps = new HashMap<>();
+                for (Map.Entry<String, Object> entry : playerData.entrySet()) {
+                    if (entry.getValue() instanceof List) {
+                        List<Object> rawList = (List<Object>) entry.getValue();
+                        List<Double> coords = new ArrayList<>();
+                        for (Object o : rawList) {
+                            coords.add(Double.parseDouble(o.toString()));
+                        }
+                        playerWarps.put(entry.getKey(), coords);
+                    }
+                }
+                warps.put(player, playerWarps);
+            }
         }
     }
 
     public void save() {
-        for (Map.Entry<String, Map<String, double[]>> entry : warps.entrySet()) {
+        for (Map.Entry<String, Map<String, List<Double>>> entry : warps.entrySet()) {
             config.set(entry.getKey(), entry.getValue());
         }
         config.save();
     }
 
-    public Map<String, double[]> getPlayerWarps(String player) {
+    public Map<String, List<Double>> getPlayerWarps(String player) {
         return warps.computeIfAbsent(player, k -> new HashMap<>());
     }
 
@@ -61,13 +75,13 @@ public class WarpManager {
         return getPlayerWarps(player).containsKey(warpName);
     }
 
-    public void addWarp(String player, String warpName, double[] coords) {
-        getPlayerWarps(player).put(warpName, coords);
+    public void addWarp(String player, String warpName, double x, double y, double z) {
+        getPlayerWarps(player).put(warpName, Arrays.asList(x, y, z));
         save();
     }
 
     public boolean removeWarp(String player, String warpName) {
-        Map<String, double[]> playerWarps = getPlayerWarps(player);
+        Map<String, List<Double>> playerWarps = getPlayerWarps(player);
         if (playerWarps.containsKey(warpName)) {
             playerWarps.remove(warpName);
             save();
@@ -76,7 +90,26 @@ public class WarpManager {
         return false;
     }
 
-    public double[] getWarp(String player, String warpName) {
+    public List<Double> getWarp(String player, String warpName) {
         return getPlayerWarps(player).get(warpName);
+    }
+
+    public String findOwnerOfWarp(String warpName) {
+        for (Map.Entry<String, Map<String, List<Double>>> entry : warps.entrySet()) {
+            if (entry.getValue().containsKey(warpName)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public Map<String, String> getAllWarpsWithOwners() {
+        Map<String, String> all = new LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, List<Double>>> entry : warps.entrySet()) {
+            for (String warp : entry.getValue().keySet()) {
+                all.put(warp, entry.getKey());
+            }
+        }
+        return all;
     }
 }
