@@ -33,6 +33,8 @@ import cn.nukkit.form.window.*;
 import cn.nukkit.level.Location;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WarpFormHandler implements Listener {
@@ -64,24 +66,37 @@ public class WarpFormHandler implements Listener {
             return;
         }
 
-        double[] coords = {player.getX(), player.getY(), player.getZ()};
-        WarpMain.warpManager.addWarp(player.getName(), warpName, coords);
+        WarpMain.warpManager.addWarp(player.getName(), warpName, player.getX(), player.getY(), player.getZ());
         player.sendMessage(WarpMain.configManager.replace(WarpMain.configManager.msgWarpSetSuccess, "warp", warpName));
     }
 
     public void showDeleteWarpForm(Player player) {
-        Map<String, double[]> warps = WarpMain.warpManager.getPlayerWarps(player.getName());
+        boolean seeAll = player.hasPermission("formwarps.commands.delwarp.others");
+
+        Map<String, String> warps = seeAll
+                ? WarpMain.warpManager.getAllWarpsWithOwners()
+                : new LinkedHashMap<>();
+
+        if (!seeAll) {
+            for (String warp : WarpMain.warpManager.getPlayerWarps(player.getName()).keySet()) {
+                warps.put(warp, player.getName());
+            }
+        }
+
         FormWindowSimple form = new FormWindowSimple(
                 WarpMain.configManager.formDeletewarpTitle,
                 WarpMain.configManager.formDeletewarpDesc
         );
+
         if (warps.isEmpty()) {
             form.addButton(new ElementButton(WarpMain.configManager.msgNoWarps));
         } else {
-            for (String warp : warps.keySet()) {
-                form.addButton(new ElementButton(warp, new ElementButtonImageData("path", "textures/items/campfire")));
+            for (Map.Entry<String, String> entry : warps.entrySet()) {
+                String label = seeAll ? entry.getKey() + " (" + entry.getValue() + ")" : entry.getKey();
+                form.addButton(new ElementButton(label, new ElementButtonImageData("path", "textures/items/campfire")));
             }
         }
+
         player.showFormWindow(form, 2);
     }
 
@@ -99,24 +114,20 @@ public class WarpFormHandler implements Listener {
     }
 
     public void teleportToWarp(Player player, String warpName) {
-        double[] coords = WarpMain.warpManager.getWarp(player.getName(), warpName);
-        if (coords == null) {
+        String owner = WarpMain.warpManager.findOwnerOfWarp(warpName);
+        if (owner == null) {
             player.sendMessage(WarpMain.configManager.msgWarpNotFound);
             return;
         }
-        player.teleport(new Location(coords[0], coords[1], coords[2], player.getLevel()));
-        player.sendMessage(WarpMain.configManager.replace(WarpMain.configManager.msgWarpTpSuccess, "warp", warpName));
-    }
 
-    public void showConfirmDeleteForm(Player player, String warpName) {
-        FormWindowSimple form = new FormWindowSimple(
-                WarpMain.configManager.formConfirmTitle,
-                WarpMain.configManager.replace(WarpMain.configManager.formConfirmDesc, "warp", warpName)
-        );
-        form.addButton(new ElementButton(WarpMain.configManager.msgYes));
-        form.addButton(new ElementButton(WarpMain.configManager.msgNo));
-        confirmMap.put(player.getName(), warpName);
-        player.showFormWindow(form, 3);
+        List<Double> coords = WarpMain.warpManager.getWarp(owner, warpName);
+        if (coords == null || coords.size() != 3) {
+            player.sendMessage(WarpMain.configManager.msgWarpNotFound);
+            return;
+        }
+
+        player.teleport(new Location(coords.get(0), coords.get(1), coords.get(2), player.getLevel()));
+        player.sendMessage(WarpMain.configManager.replace(WarpMain.configManager.msgWarpTpSuccess, "warp", warpName));
     }
 
     @EventHandler
@@ -124,46 +135,61 @@ public class WarpFormHandler implements Listener {
         Player player = event.getPlayer();
         if (event.wasClosed()) return;
 
-        if (event.getWindow() instanceof FormWindowCustom) {
-            FormWindowCustom form = (FormWindowCustom) event.getWindow();
+        if (event.getWindow() instanceof FormWindowCustom form) {
             FormResponseCustom response = (FormResponseCustom) event.getResponse();
             if (response == null) return;
-
             String title = form.getTitle();
 
             if (title.equals(WarpMain.configManager.formSetwarpTitle)) {
                 String warpName = response.getInputResponse(0);
-                if (warpName != null && !warpName.trim().isEmpty()) {
-                    setWarp(player, warpName.trim());
-                }
+                if (warpName != null) setWarp(player, warpName.trim());
             }
 
             if (title.equals(WarpMain.configManager.formWarpTitle)) {
                 String warpName = response.getInputResponse(0);
-                if (warpName != null && !warpName.trim().isEmpty()) {
-                    teleportToWarp(player, warpName.trim());
-                }
+                if (warpName != null) teleportToWarp(player, warpName.trim());
             }
         }
 
-        if (event.getWindow() instanceof FormWindowSimple) {
-            FormWindowSimple form = (FormWindowSimple) event.getWindow();
+        if (event.getWindow() instanceof FormWindowSimple form) {
             FormResponseSimple response = (FormResponseSimple) event.getResponse();
+            if (response == null) return;
+
             String title = form.getTitle();
+            int index = response.getClickedButtonId();
 
             if (title.equals(WarpMain.configManager.formDeletewarpTitle)) {
-                Map<String, double[]> warps = WarpMain.warpManager.getPlayerWarps(player.getName());
-                int index = response.getClickedButtonId();
+                boolean seeAll = player.hasPermission("formwarps.commands.delwarp.others");
+                Map<String, String> warps = seeAll
+                        ? WarpMain.warpManager.getAllWarpsWithOwners()
+                        : new LinkedHashMap<>();
+
+                if (!seeAll) {
+                    for (String warp : WarpMain.warpManager.getPlayerWarps(player.getName()).keySet()) {
+                        warps.put(warp, player.getName());
+                    }
+                }
+
                 if (index < warps.size()) {
                     String warpName = (String) warps.keySet().toArray()[index];
-                    showConfirmDeleteForm(player, warpName);
+                    String owner = warps.get(warpName);
+                    confirmMap.put(player.getName(), warpName + ":" + owner);
+
+                    FormWindowSimple confirm = new FormWindowSimple(
+                            WarpMain.configManager.formConfirmTitle,
+                            WarpMain.configManager.replace(WarpMain.configManager.formConfirmDesc, "warp", warpName)
+                    );
+                    confirm.addButton(new ElementButton(WarpMain.configManager.msgYes));
+                    confirm.addButton(new ElementButton(WarpMain.configManager.msgNo));
+                    player.showFormWindow(confirm, 3);
                 }
             }
 
             if (title.equals(WarpMain.configManager.formConfirmTitle)) {
-                String warpName = confirmMap.remove(player.getName());
-                if (response.getClickedButtonId() == 0 && warpName != null) {
-                    deleteWarp(player, warpName, player.getName());
+                String data = confirmMap.remove(player.getName());
+                if (response.getClickedButtonId() == 0 && data != null) {
+                    String[] parts = data.split(":", 2);
+                    deleteWarp(player, parts[0], parts[1]);
                 }
             }
         }
