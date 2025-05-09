@@ -43,14 +43,14 @@ public class WarpMain extends PluginBase implements Listener {
         configManager = new ConfigManager(this);
         formHandler = new WarpFormHandler(this);
         getServer().getPluginManager().registerEvents(formHandler, this);
-        getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "successfully enabled!");
-        getLogger().info(TextFormat.DARK_AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
+        getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "enabled!");
+        getLogger().info(TextFormat.DARK_AQUA + "Plugin from: " + TextFormat.AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(TextFormat.RED + "This command is only available to players.");
+            sender.sendMessage(TextFormat.RED + "Only players can use this command.");
             return true;
         }
 
@@ -68,19 +68,15 @@ public class WarpMain extends PluginBase implements Listener {
                 } else {
                     formHandler.showSetWarpForm(player);
                 }
-                break;
+                return true;
 
             case "delwarp":
                 if (!player.hasPermission("formwarps.commands.delwarp")) {
                     player.sendMessage(configManager.msgNoPermission);
                     return true;
                 }
-                if (args.length == 1) {
-                    formHandler.deleteWarp(player, args[0], player.getName());
-                } else {
-                    formHandler.showDeleteWarpForm(player);
-                }
-                break;
+                formHandler.showDeleteWarpForm(player);
+                return true;
 
             case "warp":
                 if (!player.hasPermission("formwarps.commands.warp")) {
@@ -92,9 +88,10 @@ public class WarpMain extends PluginBase implements Listener {
                 } else {
                     formHandler.showWarpForm(player);
                 }
-                break;
-        }
+                return true;
 
-        return true;
+            default:
+                return false;
+        }
     }
 }
