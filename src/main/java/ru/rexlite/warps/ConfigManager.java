@@ -31,6 +31,7 @@ public class ConfigManager {
 
     private final Config config;
 
+    // messages
     public String msgWarpUsage;
     public String msgWarpTpSuccess;
     public String msgWarpSetSuccess;
@@ -41,6 +42,7 @@ public class ConfigManager {
     public String msgNameTooShort;
     public String msgNoWarps;
 
+    // form text
     public String formSetwarpTitle;
     public String formSetwarpInput;
     public String formDeletewarpTitle;
@@ -50,7 +52,13 @@ public class ConfigManager {
     public String formWarpTitle;
     public String formWarpInput;
     public String formTipWarp;
-
+    public String formWarpsTitle;
+    public String formWarpsDesc;
+    public String formWarpInfoTitle;
+    public String formWarpInfoDesc;
+    public String formWarpInfoTeleport;
+    public String formWarpInfoRemove;
+    public String formWarpInfoBack;
     public String msgYes;
     public String msgNo;
 
@@ -58,6 +66,7 @@ public class ConfigManager {
         plugin.saveDefaultConfig();
         this.config = plugin.getConfig();
 
+        // messages
         msgWarpUsage = get("warp-usage", "§7> §cUsage: §e/warp <warp name>");
         msgWarpTpSuccess = get("warp-tp-success", "§7> §fTeleported to warp §b{warp}");
         msgWarpSetSuccess = get("warp-set-success", "§7> §fWarp §b{warp} §fcreated successfully!");
@@ -68,6 +77,7 @@ public class ConfigManager {
         msgNameTooShort = get("name-too-short", "§7> §cWarp name must be between §e2§c and §e14§c characters.");
         msgNoWarps = get("no-warps", "You have no warps.");
 
+        // forms
         formSetwarpTitle = get("form-setwarp-title", "Create Warp Point");
         formSetwarpInput = get("form-setwarp-input", "Enter warp name (2-14 characters):");
         formDeletewarpTitle = get("form-deletewarp-title", "Delete Warp");
@@ -77,7 +87,13 @@ public class ConfigManager {
         formWarpTitle = get("form-warp-title", "Teleport to warp");
         formWarpInput = get("form-warp-input", "Enter warp name:");
         formTipWarp = get("form-tip-warp", "warp name");
-
+        formWarpsTitle = get("form-warps-title", "Server Warps");
+        formWarpsDesc = get("form-warps-desc", "Select a warp:");
+        formWarpInfoTitle = get("form-warpinfo-title", "Warp Info");
+        formWarpInfoDesc = get("form-warpinfo-desc", "Info about §e{warp}§f warp");
+        formWarpInfoTeleport = get("form-warpinfo-teleport", "Teleport to warp");
+        formWarpInfoRemove = get("form-warpinfo-remove", "Remove warp");
+        formWarpInfoBack = get("form-warpinfo-back", "Back");
         msgYes = get("yes", "§2Yes");
         msgNo = get("no", "§cNo");
     }
