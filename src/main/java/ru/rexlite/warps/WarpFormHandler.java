@@ -1,26 +1,3 @@
-/*
- * This file is part of EssentialsChat, licensed under the MIT License.
- *
- *  Copyright (c) Ivan <CrieXD1337> <criex1337@gmail.com>
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
- */
 package ru.rexlite.warps;
 
 import cn.nukkit.Player;
@@ -31,6 +8,7 @@ import cn.nukkit.form.element.*;
 import cn.nukkit.form.response.*;
 import cn.nukkit.form.window.*;
 import cn.nukkit.level.Location;
+import cn.nukkit.utils.TextFormat;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,6 +17,13 @@ import java.util.Map;
 
 public class WarpFormHandler implements Listener {
 
+    private static final int SET_WARP_FORM = 8562;
+    private static final int DELETE_WARP_FORM = 8563;
+    private static final int CONFIRM_FORM = 8564;
+    private static final int WARP_FORM = 8565;
+    private static final int ALL_WARPS_FORM = 8566;
+    private static final int WARP_INFO_FORM = 8567;
+
     private final Map<String, String> confirmMap = new HashMap<>();
 
     public WarpFormHandler(WarpMain plugin) {}
@@ -46,28 +31,13 @@ public class WarpFormHandler implements Listener {
     public void showSetWarpForm(Player player) {
         FormWindowCustom form = new FormWindowCustom(WarpMain.configManager.formSetwarpTitle);
         form.addElement(new ElementInput(WarpMain.configManager.formSetwarpInput, WarpMain.configManager.formTipWarp));
-        player.showFormWindow(form, 1);
+        player.showFormWindow(form, SET_WARP_FORM); // Use a constant instead of id
     }
 
     public void showWarpForm(Player player) {
         FormWindowCustom form = new FormWindowCustom(WarpMain.configManager.formWarpTitle);
         form.addElement(new ElementInput(WarpMain.configManager.formWarpInput, WarpMain.configManager.formTipWarp));
-        player.showFormWindow(form, 4);
-    }
-
-    public void setWarp(Player player, String warpName) {
-        if (warpName.length() < 2 || warpName.length() > 14) {
-            player.sendMessage(WarpMain.configManager.msgNameTooShort);
-            return;
-        }
-
-        if (WarpMain.warpManager.warpExists(player.getName(), warpName)) {
-            player.sendMessage(WarpMain.configManager.msgWarpExists);
-            return;
-        }
-
-        WarpMain.warpManager.addWarp(player.getName(), warpName, player.getX(), player.getY(), player.getZ());
-        player.sendMessage(WarpMain.configManager.replace(WarpMain.configManager.msgWarpSetSuccess, "warp", warpName));
+        player.showFormWindow(form, WARP_FORM);
     }
 
     public void showDeleteWarpForm(Player player) {
@@ -92,12 +62,96 @@ public class WarpFormHandler implements Listener {
             form.addButton(new ElementButton(WarpMain.configManager.msgNoWarps));
         } else {
             for (Map.Entry<String, String> entry : warps.entrySet()) {
-                String label = seeAll ? entry.getKey() + " (" + entry.getValue() + ")" : entry.getKey();
+                String label = seeAll ? entry.getKey() + "\n (" + entry.getValue() + ")" : entry.getKey();
                 form.addButton(new ElementButton(label, new ElementButtonImageData("path", "textures/items/campfire")));
             }
         }
 
-        player.showFormWindow(form, 2);
+        player.showFormWindow(form, DELETE_WARP_FORM);
+    }
+
+    private final Map<String, String> warpInfoMap = new HashMap<>();
+
+    public void showWarpsForm(Player player) {
+        FormWindowSimple form = new FormWindowSimple(
+                WarpMain.configManager.formWarpsTitle,
+                WarpMain.configManager.formWarpsDesc
+        );
+
+        Map<String, String> allWarps = WarpMain.warpManager.getAllWarpsWithOwners();
+        Map<String, String> opWarps = new LinkedHashMap<>();
+        Map<String, String> otherWarps = new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> entry : allWarps.entrySet()) {
+            String warpName = entry.getKey();
+            String owner = entry.getValue();
+            Player ownerPlayer = WarpMain.getInstance().getServer().getPlayerExact(owner);
+            boolean isOp = ownerPlayer != null && ownerPlayer.isOp();
+
+            if (isOp) {
+                opWarps.put(warpName, owner);
+            } else {
+                otherWarps.put(warpName, owner);
+            }
+        }
+
+        Map<String, String> sortedWarps = new LinkedHashMap<>();
+        sortedWarps.putAll(opWarps);
+        sortedWarps.putAll(otherWarps);
+
+        if (sortedWarps.isEmpty()) {
+            form.addButton(new ElementButton(WarpMain.configManager.msgNoWarps));
+        } else {
+            for (Map.Entry<String, String> entry : sortedWarps.entrySet()) {
+                String label = entry.getKey() + "\n (" + entry.getValue() + ")";
+                form.addButton(new ElementButton(label, new ElementButtonImageData("path", "textures/items/campfire")));
+            }
+        }
+
+        player.showFormWindow(form, ALL_WARPS_FORM);
+    }
+
+    public void showWarpInfoForm(Player player, String warpName, String owner) {
+        FormWindowSimple form = new FormWindowSimple(
+                WarpMain.configManager.formWarpInfoTitle,
+                WarpMain.configManager.replace(WarpMain.configManager.formWarpInfoDesc, "warp", warpName)
+        );
+
+        warpInfoMap.put(player.getName(), warpName + ":" + owner);
+
+        form.addButton(new ElementButton(
+                WarpMain.configManager.formWarpInfoTeleport,
+                new ElementButtonImageData("path", "textures/ui/icon_import.png")
+        ));
+
+        if (player.hasPermission("formwarps.commands.delwarp.others") || player.getName().equals(owner)) {
+            form.addButton(new ElementButton(
+                    WarpMain.configManager.formWarpInfoRemove,
+                    new ElementButtonImageData("path", "textures/ui/cancel.png")
+            ));
+        }
+
+        form.addButton(new ElementButton(
+                WarpMain.configManager.formWarpInfoBack,
+                new ElementButtonImageData("path", "textures/ui/arrow_left.png")
+        ));
+
+        player.showFormWindow(form, WARP_INFO_FORM);
+    }
+
+    public void setWarp(Player player, String warpName) {
+        if (warpName.length() < 2 || warpName.length() > 14) {
+            player.sendMessage(WarpMain.configManager.msgNameTooShort);
+            return;
+        }
+
+        if (WarpMain.warpManager.warpExists(player.getName(), warpName)) {
+            player.sendMessage(WarpMain.configManager.msgWarpExists);
+            return;
+        }
+
+        WarpMain.warpManager.addWarp(player.getName(), warpName, player.getX(), player.getY(), player.getZ());
+        player.sendMessage(TextFormat.colorize(WarpMain.configManager.replace(WarpMain.configManager.msgWarpSetSuccess, "warp", warpName)));
     }
 
     public void deleteWarp(Player player, String warpName, String owner) {
@@ -181,7 +235,7 @@ public class WarpFormHandler implements Listener {
                     );
                     confirm.addButton(new ElementButton(WarpMain.configManager.msgYes));
                     confirm.addButton(new ElementButton(WarpMain.configManager.msgNo));
-                    player.showFormWindow(confirm, 3);
+                    player.showFormWindow(confirm, CONFIRM_FORM);
                 }
             }
 
@@ -190,6 +244,60 @@ public class WarpFormHandler implements Listener {
                 if (response.getClickedButtonId() == 0 && data != null) {
                     String[] parts = data.split(":", 2);
                     deleteWarp(player, parts[0], parts[1]);
+                }
+            }
+
+            if (title.equals(WarpMain.configManager.formWarpsTitle)) {
+                Map<String, String> allWarps = WarpMain.warpManager.getAllWarpsWithOwners();
+                Map<String, String> opWarps = new LinkedHashMap<>();
+                Map<String, String> otherWarps = new LinkedHashMap<>();
+
+                for (Map.Entry<String, String> entry : allWarps.entrySet()) {
+                    String warpName = entry.getKey();
+                    String owner = entry.getValue();
+                    Player ownerPlayer = WarpMain.getInstance().getServer().getPlayerExact(owner);
+                    boolean isOp = ownerPlayer != null && ownerPlayer.isOp();
+
+                    if (isOp) {
+                        opWarps.put(warpName, owner);
+                    } else {
+                        otherWarps.put(warpName, owner);
+                    }
+                }
+
+                Map<String, String> sortedWarps = new LinkedHashMap<>();
+                sortedWarps.putAll(opWarps);
+                sortedWarps.putAll(otherWarps);
+
+                if (index < sortedWarps.size()) {
+                    String warpName = (String) sortedWarps.keySet().toArray()[index];
+                    String owner = sortedWarps.get(warpName);
+                    showWarpInfoForm(player, warpName, owner);
+                }
+            }
+
+            if (title.equals(WarpMain.configManager.formWarpInfoTitle)) {
+                String data = warpInfoMap.get(player.getName());
+                if (data == null) return;
+
+                String[] parts = data.split(":", 2);
+                String warpName = parts[0];
+                String owner = parts[1];
+
+                if (index == 0) {
+                    teleportToWarp(player, warpName);
+                } else if (index == 1 && (player.hasPermission("formwarps.commands.delwarp.others") || player.getName().equals(owner))) {
+                    confirmMap.put(player.getName(), warpName + ":" + owner);
+                    FormWindowSimple confirm = new FormWindowSimple(
+                            WarpMain.configManager.formConfirmTitle,
+                            WarpMain.configManager.replace(WarpMain.configManager.formConfirmDesc, "warp", warpName)
+                    );
+                    confirm.addButton(new ElementButton(WarpMain.configManager.msgYes));
+                    confirm.addButton(new ElementButton(WarpMain.configManager.msgNo));
+                    player.showFormWindow(confirm, CONFIRM_FORM);
+                } else {
+                    warpInfoMap.remove(player.getName());
+                    showWarpsForm(player);
                 }
             }
         }
