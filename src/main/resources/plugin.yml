@@ -16,12 +16,17 @@ commands:
   warp:
     description: Teleport to a warp
     permission: formwarps.commands.warp
+  warps:
+    description: See all warps
+    permission: formwarps.commands.warps
 permissions:
   formwarps.commands.setwarp:
     default: op
   formwarps.commands.delwarp:
     default: op
-  formwarp.commands.delwarp.others:
+  formwarps.commands.delwarp.others:
     default: op
   formwarps.commands.warp:
+    default: true
+  formwarps.commands.warps:
     default: true
