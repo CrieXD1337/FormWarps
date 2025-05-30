@@ -10,8 +10,11 @@
 
 ## Commands
 **/warp** - open warp UI
+
 **/setwarp** - open setwarp UI
+
 **/removewarp** - open remove warps UI
+
 **/warps** - view all warps on the server (warp by OPs pinned)
 
 ## Permissions
