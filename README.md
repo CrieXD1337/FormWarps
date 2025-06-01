@@ -27,7 +27,7 @@
     - formwarps.commands.setwarp
 
 ## Config
-```
+```yaml
 messages:
   # Chat messages
   warp-usage: "§7> §cUsage: §e/warp <warp name>"
