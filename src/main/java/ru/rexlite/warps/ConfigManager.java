@@ -1,5 +1,5 @@
 /*
- * This file is part of EssentialsChat, licensed under the MIT License.
+ * This file is part of FormWarps, licensed under the MIT License.
  *
  *  Copyright (c) Ivan <CrieXD1337> <criex1337@gmail.com>
  *
@@ -21,6 +21,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
+
 package ru.rexlite.warps;
 
 import cn.nukkit.plugin.PluginBase;
