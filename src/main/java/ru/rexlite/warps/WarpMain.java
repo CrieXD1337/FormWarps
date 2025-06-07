@@ -1,5 +1,5 @@
 /*
- * This file is part of EssentialsChat, licensed under the MIT License.
+ * This file is part of FormWarps, licensed under the MIT License.
  *
  *  Copyright (c) Ivan <CrieXD1337> <criex1337@gmail.com>
  *
@@ -21,6 +21,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
+
 package ru.rexlite.warps;
 
 import cn.nukkit.Player;
@@ -45,8 +46,10 @@ public class WarpMain extends PluginBase implements Listener {
         configManager = new ConfigManager(this);
         formHandler = new WarpFormHandler(this);
         getServer().getPluginManager().registerEvents(formHandler, this);
-        getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "enabled!");
-        getLogger().info(TextFormat.AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
+        this.getLogger().info(" ")
+        this.getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "enabled!");
+        this.getLogger().info(TextFormat.AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
+        this.getLogget().info(" ")
     }
 
     public static WarpMain getInstance() {
