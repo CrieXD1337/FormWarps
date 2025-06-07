@@ -1,23 +1,20 @@
 # FormWarps
 **Plugin for warp system for Nukkit with GUI**
 
-## Features
+## ⭐ Features
 - Forms
 - Simple config
 - Creating warps
 - Teleportation to warps
 - Removing warps
 
-## Commands
-**/warp** - open warp UI
+## 🔨 Commands
+- **/warp** - open warp UI
+- **/setwarp** - open setwarp UI
+- **/removewarp** - open remove warps UI
+- **/warps** - view all warps on the server (warp by OPs pinned)
 
-**/setwarp** - open setwarp UI
-
-**/removewarp** - open remove warps UI
-
-**/warps** - view all warps on the server (warp by OPs pinned)
-
-## Permissions
+## 🔑 Permissions
 - formarps
   - formwarps.commands
     - formwarps.commands.warp
@@ -26,7 +23,10 @@
       - formwarps.commands.delwarp.others
     - formwarps.commands.setwarp
 
-## Config
+## 👾 Bugs:
+You can report bugs on [issues page](https://github.com/CrieXD1337/FormWarps/issues)
+
+## 📒 Config
 ```yaml
 messages:
   # Chat messages
@@ -59,7 +59,7 @@ messages:
   no: "§cNo"
 ```
     
-## Screenshots
+## 📸 Screenshots
 ![image](https://github.com/user-attachments/assets/9dc0b285-f736-4651-a719-6556e2851804)
 ![image](https://github.com/user-attachments/assets/88ed7d73-7362-469f-a652-cd73a720a3d9)
 ![image](https://github.com/user-attachments/assets/5cb8e867-35b5-4c8c-9bc2-af68de16104d)
