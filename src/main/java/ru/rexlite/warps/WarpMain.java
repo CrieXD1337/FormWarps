@@ -46,10 +46,10 @@ public class WarpMain extends PluginBase implements Listener {
         configManager = new ConfigManager(this);
         formHandler = new WarpFormHandler(this);
         getServer().getPluginManager().registerEvents(formHandler, this);
-        this.getLogger().info(" ")
+        this.getLogger().info(" ");
         this.getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "enabled!");
         this.getLogger().info(TextFormat.AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
-        this.getLogget().info(" ")
+        this.getLogger().info(" ");
     }
 
     public static WarpMain getInstance() {
