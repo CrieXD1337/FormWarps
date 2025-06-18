@@ -29,7 +29,7 @@ You can report bugs on [issues page](https://github.com/CrieXD1337/FormWarps/iss
 ## 📒 Config
 ```yaml
 messages:
-  # Chat messages
+  # --- Chat messages ---
   warp-usage: "§7> §cUsage: §e/warp <warp name>"
   warp-tp-success: "§7> §fTeleported to warp §b{warp}"
   warp-set-success: "§7> §fWarp §b{warp} §fcreated successfully!"
@@ -39,7 +39,7 @@ messages:
   no-permission: "§c%commands.generic.permission"
   name-too-short: "§7> §cWarp name must be between §e2§c and §e14§c characters."
 
-  # Forms text
+  # --- Forms text ---
   no-warps: "You have no warps."
   form-setwarp-title: "Create Warp Point"
   form-setwarp-input: "Enter warp name (2-14 characters):"
@@ -47,6 +47,8 @@ messages:
   form-deletewarp-desc: "Select a warp to delete:"
   form-confirm-title: "Confirm Deletion"
   form-confirm-desc: "Delete warp {warp}?"
+  form-warp-title: "Teleport to warp"
+  form-warp-input: "Enter warp name:"
   form-warp-tip: "warp name"
   form-warps-title: "Server Warps"
   form-warps-desc: "Select a warp:"
@@ -57,6 +59,39 @@ messages:
   form-warpinfo-back: "Back"
   yes: "§2Yes"
   no: "§cNo"
+
+properties:
+  # minimum characters in warp name
+  min-create-warp-characters: 2
+
+  # maximum characters in warp name
+  max-create-warp-characters: 14
+
+  # allowed characters in warp name
+  create-warp-allowed-characters: "^[a-zA-Z0-9_]+$"
+
+# --- Commands ---
+commands:
+  warp:
+    name: warp                           # command name
+    aliases: ["w"]                       # command aliases
+    description: "Teleport to a warp"    # command description
+    permission: formwarps.commands.warp  # permission
+  setwarp:
+    name: setwarp
+    aliases: ["createwarp"]
+    description: "Create a warp"
+    permission: formwarps.commands.setwarp
+  delwarp:
+    name: delwarp
+    aliases: ["removewarp", "rmwarp"]
+    description: "Delete a warp"
+    permission: formwarps.commands.delwarp
+  warps:
+    name: warps
+    aliases: []
+    description: "See all warps"
+    permission: formwarps.commands.warps
 ```
     
 ## 📸 Screenshots
