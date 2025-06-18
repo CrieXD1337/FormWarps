@@ -24,12 +24,16 @@
 
 package ru.rexlite.warps;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
 import cn.nukkit.event.Listener;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
+import ru.rexlite.warps.commands.DelWarpCommand;
+import ru.rexlite.warps.commands.SetWarpCommand;
+import ru.rexlite.warps.commands.WarpCommand;
+import ru.rexlite.warps.commands.WarpsCommand;
+import ru.rexlite.warps.forms.WarpFormHandler;
+import ru.rexlite.warps.managers.ConfigManager;
+import ru.rexlite.warps.managers.WarpManager;
 
 public class WarpMain extends PluginBase implements Listener {
 
@@ -46,69 +50,24 @@ public class WarpMain extends PluginBase implements Listener {
         configManager = new ConfigManager(this);
         formHandler = new WarpFormHandler(this);
         getServer().getPluginManager().registerEvents(formHandler, this);
+
+        // Register commands
+        registerCommands();
+
         this.getLogger().info(" ");
         this.getLogger().info(TextFormat.AQUA + "FormWarps " + TextFormat.DARK_AQUA + "enabled!");
         this.getLogger().info(TextFormat.AQUA + "Plugin from: " + TextFormat.DARK_AQUA + "https://cloudburstmc.org/resources/formwarps.1072/");
         this.getLogger().info(" ");
     }
 
-    public static WarpMain getInstance() {
-        return instance;
+    private void registerCommands() {
+        getServer().getCommandMap().register("formwarps", new SetWarpCommand(configManager.commandConfigs.get("setwarp")));
+        getServer().getCommandMap().register("formwarps", new DelWarpCommand(configManager.commandConfigs.get("delwarp")));
+        getServer().getCommandMap().register("formwarps", new WarpCommand(configManager.commandConfigs.get("warp")));
+        getServer().getCommandMap().register("formwarps", new WarpsCommand(configManager.commandConfigs.get("warps")));
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(TextFormat.RED + "Only players can use this command.");
-            return true;
-        }
-
-        Player player = (Player) sender;
-        String cmd = command.getName().toLowerCase();
-
-        switch (cmd) {
-            case "setwarp":
-                if (!player.hasPermission("formwarps.commands.setwarp")) {
-                    player.sendMessage(configManager.msgNoPermission);
-                    return true;
-                }
-                if (args.length == 1) {
-                    formHandler.setWarp(player, args[0]);
-                } else {
-                    formHandler.showSetWarpForm(player);
-                }
-                return true;
-
-            case "delwarp":
-                if (!player.hasPermission("formwarps.commands.delwarp")) {
-                    player.sendMessage(configManager.msgNoPermission);
-                    return true;
-                }
-                formHandler.showDeleteWarpForm(player);
-                return true;
-
-            case "warp":
-                if (!player.hasPermission("formwarps.commands.warp")) {
-                    player.sendMessage(configManager.msgNoPermission);
-                    return true;
-                }
-                if (args.length == 1) {
-                    formHandler.teleportToWarp(player, args[0]);
-                } else {
-                    formHandler.showWarpForm(player);
-                }
-                return true;
-
-            case "warps":
-                if (!player.hasPermission("formwarps.commands.warps")) {
-                    player.sendMessage(configManager.msgNoPermission);
-                    return true;
-                }
-                formHandler.showWarpsForm(player);
-                return true;
-
-            default:
-                return false;
-        }
+    public static WarpMain getInstance() {
+        return instance;
     }
 }
