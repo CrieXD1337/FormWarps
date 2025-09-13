@@ -22,39 +22,17 @@
  *  SOFTWARE.
  */
 
-package ru.rexlite.warps.commands;
+package ru.rexlite.warps.utils;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
 import cn.nukkit.utils.TextFormat;
-import ru.rexlite.warps.managers.ConfigManager;
-import ru.rexlite.warps.forms.WarpFormHandler;
-import ru.rexlite.warps.WarpMain;
 
-public class DelWarpCommand extends Command {
+public class TextUtils {
 
-    public DelWarpCommand(ConfigManager.CommandConfig config) {
-        super(config.getName(), config.getDescription(), "/" + config.getName(), config.getAliases().toArray(new String[0]));
-        setPermission(config.getPermission());
+    public static String colorize(String text) {
+        return TextFormat.colorize(text);
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(TextFormat.RED + "Only players can use this command.");
-            return true;
-        }
-
-        Player player = (Player) sender;
-        WarpFormHandler formHandler = WarpMain.formHandler;
-
-        if (!testPermission(player)) {
-            player.sendMessage(WarpMain.configManager.msgNoPermission);
-            return true;
-        }
-
-        formHandler.showDeleteWarpForm(player);
-        return true;
+    public static String replace(String text, String key, String value) {
+        return text.replace("{" + key + "}", value);
     }
 }

@@ -22,20 +22,20 @@
  *  SOFTWARE.
  */
 
-package ru.rexlite.warps.commands;
+package ru.rexlite.warps.command;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.utils.TextFormat;
-import ru.rexlite.warps.managers.ConfigManager;
-import ru.rexlite.warps.forms.WarpFormHandler;
 import ru.rexlite.warps.WarpMain;
+import ru.rexlite.warps.form.WarpFormHandler;
+import ru.rexlite.warps.service.ConfigService;
 
-public class WarpCommand extends Command {
+public class DelWarpCommand extends Command {
 
-    public WarpCommand(ConfigManager.CommandConfig config) {
-        super(config.getName(), config.getDescription(), "/" + config.getName() + " [warpName]", config.getAliases().toArray(new String[0]));
+    public DelWarpCommand(ConfigService.CommandConfig config) {
+        super(config.getName(), config.getDescription(), "/" + config.getName(), config.getAliases().toArray(new String[0]));
         setPermission(config.getPermission());
     }
 
@@ -47,18 +47,14 @@ public class WarpCommand extends Command {
         }
 
         Player player = (Player) sender;
-        WarpFormHandler formHandler = WarpMain.formHandler;
+        WarpFormHandler formHandler = WarpMain.getFormHandler();
 
         if (!testPermission(player)) {
-            player.sendMessage(WarpMain.configManager.msgNoPermission);
+            player.sendMessage(WarpMain.getConfigService().getMsgNoPermission());
             return true;
         }
 
-        if (args.length == 1) {
-            formHandler.teleportToWarp(player, args[0]);
-        } else {
-            formHandler.showWarpForm(player);
-        }
+        formHandler.showDeleteWarpForm(player);
         return true;
     }
 }

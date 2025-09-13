@@ -1,0 +1,7 @@
+[versions]
+cn-nukkit-nukkit = "1.0-SNAPSHOT"
+org-projectlombok-lombok = "1.18.34"
+
+[libraries]
+cn-nukkit-nukkit = { module = "cn.nukkit:nukkit", version.ref = "cn-nukkit-nukkit" }
+org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = "org-projectlombok-lombok" }

@@ -22,65 +22,65 @@
  *  SOFTWARE.
  */
 
-package ru.rexlite.warps.managers;
+package ru.rexlite.warps.service;
 
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
-public class ConfigManager {
+@Getter
+public class ConfigService {
 
     private final Config config;
-    public final Map<String, CommandConfig> commandConfigs = new HashMap<>();
-    public int minCreateWarpCharacters;
-    public int maxCreateWarpCharacters;
-    public String allowedWarpCharacters;
+    private final Map<String, CommandConfig> commandConfigs = new HashMap<>();
+    private int minCreateWarpCharacters;
+    private int maxCreateWarpCharacters;
+    private String allowedWarpCharacters;
 
-    // messages
-    public String msgWarpUsage;
-    public String msgWarpTpSuccess;
-    public String msgWarpSetSuccess;
-    public String msgWarpExists;
-    public String msgWarpNotFound;
-    public String msgWarpDeleted;
-    public String msgNoPermission;
-    public String msgNameTooShort;
-    public String msgNameInvalidCharacters;
-    public String msgNoWarps;
-    public String formSetwarpTitle;
-    public String formSetwarpInput;
-    public String formDeletewarpTitle;
-    public String formDeletewarpDesc;
-    public String formConfirmTitle;
-    public String formConfirmDesc;
-    public String formWarpTitle;
-    public String formWarpInput;
-    public String formTipWarp;
-    public String formWarpsTitle;
-    public String formWarpsDesc;
-    public String formWarpInfoTitle;
-    public String formWarpInfoDesc;
-    public String formWarpInfoTeleport;
-    public String formWarpInfoRemove;
-    public String formWarpInfoBack;
-    public String msgYes;
-    public String msgNo;
+    // Messages
+    @Setter private String msgWarpUsage;
+    @Setter private String msgWarpTpSuccess;
+    @Setter private String msgWarpSetSuccess;
+    @Setter private String msgWarpExists;
+    @Setter private String msgWarpNotFound;
+    @Setter private String msgWarpDeleted;
+    @Setter private String msgNoPermission;
+    @Setter private String msgNameTooShort;
+    @Setter private String msgNameInvalidCharacters;
+    @Setter private String msgNoWarps;
+    @Setter private String formSetwarpTitle;
+    @Setter private String formSetwarpInput;
+    @Setter private String formDeletewarpTitle;
+    @Setter private String formDeletewarpDesc;
+    @Setter private String formConfirmTitle;
+    @Setter private String formConfirmDesc;
+    @Setter private String formWarpTitle;
+    @Setter private String formWarpInput;
+    @Setter private String formTipWarp;
+    @Setter private String formWarpsTitle;
+    @Setter private String formWarpsDesc;
+    @Setter private String formWarpInfoTitle;
+    @Setter private String formWarpInfoDesc;
+    @Setter private String formWarpInfoTeleport;
+    @Setter private String formWarpInfoRemove;
+    @Setter private String formWarpInfoBack;
+    @Setter private String msgYes;
+    @Setter private String msgNo;
 
-    public ConfigManager(PluginBase plugin) {
+    public ConfigService(PluginBase plugin) {
         plugin.saveDefaultConfig();
         this.config = plugin.getConfig();
 
-        // Load command configurations
         loadCommandConfigs();
 
-        // Load properties
         minCreateWarpCharacters = config.getInt("properties.min-create-warp-characters", 2);
         maxCreateWarpCharacters = config.getInt("properties.max-create-warp-characters", 14);
         allowedWarpCharacters = config.getString("properties.create-warp-allowed-characters", "^[a-zA-Z0-9_]+$");
 
-        // Validate regex
         try {
             "".matches(allowedWarpCharacters);
         } catch (Exception e) {
@@ -88,37 +88,35 @@ public class ConfigManager {
             allowedWarpCharacters = "^[a-zA-Z0-9_]+$";
         }
 
-        // messages
-        msgWarpUsage = get("warp-usage", "§7> §cUsage: §e/warp <warp-name>");
-        msgWarpTpSuccess = get("warp-tp-success", "§7> §fTeleported to warp §b{warp}");
-        msgWarpSetSuccess = get("warp-set-success", "§7> §fWarp §b{warp} §fcreated successfully!");
-        msgWarpExists = get("warp-exists", "§7> This warp already exists!");
-        msgWarpNotFound = get("warp-not-found", "§7> §cWarp not found!");
-        msgWarpDeleted = get("warp-deleted", "§7> §fWarp §b{warp} §fdeleted successfully.");
-        msgNoPermission = get("no-permission", "§c%commands.generic.permission");
-        msgNameTooShort = get("name-too-short", "§7> §cWarp name must be between §e{min}§c and §e{max}§c characters.");
-        msgNameInvalidCharacters = get("name-invalid-characters", "§7> §cWarp name contains invalid characters. Allowed: {allowed}");
-        msgNoWarps = get("no-warps", "You have no warps.");
+        msgWarpUsage = getMessage("warp-usage", "&7> &cUsage: &e/warp <warp-name>");
+        msgWarpTpSuccess = getMessage("warp-tp-success", "&7> &fTeleported to warp &b{warp}");
+        msgWarpSetSuccess = getMessage("warp-set-success", "&7> &fWarp &b{warp} &fcreated successfully!");
+        msgWarpExists = getMessage("warp-exists", "&7> This warp already exists!");
+        msgWarpNotFound = getMessage("warp-not-found", "&7> &cWarp not found!");
+        msgWarpDeleted = getMessage("warp-deleted", "&7> &fWarp &b{warp} &fdeleted successfully.");
+        msgNoPermission = getMessage("no-permission", "&c%commands.generic.permission");
+        msgNameTooShort = getMessage("name-too-short", "&7> &cWarp name must be between &e{min}&c and &e{max}&c characters.");
+        msgNameInvalidCharacters = getMessage("name-invalid-characters", "&7> &cWarp name contains invalid characters. Allowed: {allowed}");
+        msgNoWarps = getMessage("no-warps", "You have no warps.");
 
-        // forms
-        formSetwarpTitle = get("form-setwarp-title", "Create Warp Point");
-        formSetwarpInput = get("form-setwarp-input", "Enter warp name ({min}-{max} characters, allowed: {allowed}):");
-        formDeletewarpTitle = get("form-deletewarp-title", "Delete Warp");
-        formDeletewarpDesc = get("form-deletewarp-desc", "Select a warp to delete:");
-        formConfirmTitle = get("form-confirm-title", "Confirm Deletion");
-        formConfirmDesc = get("form-confirm-desc", "Delete warp {warp}?");
-        formWarpTitle = get("form-warp-title", "Teleport to warp");
-        formWarpInput = get("form-warp-input", "Enter warp name:");
-        formTipWarp = get("form-tip-warp", "warp name");
-        formWarpsTitle = get("warps-title", "Server Warps");
-        formWarpsDesc = get("form-warps-desc", "Select a warp:");
-        formWarpInfoTitle = get("form-warpinfo-title", "Warp Info");
-        formWarpInfoDesc = get("form-warpinfo-desc", "Info about §e{warp}§f warp");
-        formWarpInfoTeleport = get("form-warpinfo-teleport", "Teleport to warp");
-        formWarpInfoRemove = get("form-warpinfo-remove", "Remove warp");
-        formWarpInfoBack = get("form-warpinfo-back", "Back");
-        msgYes = get("yes", "§2Yes");
-        msgNo = get("no", "§cNo");
+        formSetwarpTitle = getMessage("form-setwarp-title", "Create Warp Point");
+        formSetwarpInput = getMessage("form-setwarp-input", "Enter warp name ({min}-{max} characters, allowed: {allowed}):");
+        formDeletewarpTitle = getMessage("form-deletewarp-title", "Delete Warp");
+        formDeletewarpDesc = getMessage("form-deletewarp-desc", "Select a warp to delete:");
+        formConfirmTitle = getMessage("form-confirm-title", "Confirm Deletion");
+        formConfirmDesc = getMessage("form-confirm-desc", "Delete warp {warp}?");
+        formWarpTitle = getMessage("form-warp-title", "Teleport to warp");
+        formWarpInput = getMessage("form-warp-input", "Enter warp name:");
+        formTipWarp = getMessage("form-tip-warp", "warp name");
+        formWarpsTitle = getMessage("warps-title", "Server Warps");
+        formWarpsDesc = getMessage("form-warps-desc", "Select a warp:");
+        formWarpInfoTitle = getMessage("form-warpinfo-title", "Warp Info");
+        formWarpInfoDesc = getMessage("form-warpinfo-desc", "Info about &e{warp}&f warp");
+        formWarpInfoTeleport = getMessage("form-warpinfo-teleport", "Teleport to warp");
+        formWarpInfoRemove = getMessage("form-warpinfo-remove", "Remove warp");
+        formWarpInfoBack = getMessage("form-warpinfo-back", "Back");
+        msgYes = getMessage("yes", "&2Yes");
+        msgNo = getMessage("no", "&cNo");
     }
 
     private void loadCommandConfigs() {
@@ -127,7 +125,6 @@ public class ConfigManager {
             commandsSection = new HashMap<>();
         }
 
-        // Default command configs
         Map<String, CommandConfig> defaults = new HashMap<>();
         defaults.put("warp", new CommandConfig("warp", Arrays.asList("w"), "Teleport to a warp", "formwarps.commands.warp"));
         defaults.put("setwarp", new CommandConfig("setwarp", Arrays.asList("createwarp"), "Create a warp", "formwarps.commands.setwarp"));
@@ -148,14 +145,23 @@ public class ConfigManager {
         }
     }
 
-    private String get(String key, String def) {
+    private String getMessage(String key, String def) {
         return TextFormat.colorize(config.getString("messages." + key, def));
+    }
+
+    private String get(String key, String def) {
+        return TextFormat.colorize(config.getString(key, def));
     }
 
     public String replace(String msg, String key, String value) {
         return msg.replace("{" + key + "}", value);
     }
 
+    public CommandConfig getCommandConfig(String key) {
+        return commandConfigs.get(key);
+    }
+
+    @Getter
     public static class CommandConfig {
         private final String name;
         private final List<String> aliases;
@@ -167,22 +173,6 @@ public class ConfigManager {
             this.aliases = aliases;
             this.description = description;
             this.permission = permission;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public List<String> getAliases() {
-            return aliases;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getPermission() {
-            return permission;
         }
     }
 }

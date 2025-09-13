@@ -22,19 +22,21 @@
  *  SOFTWARE.
  */
 
-package ru.rexlite.warps.managers;
+package ru.rexlite.warps.service;
 
 import cn.nukkit.utils.Config;
+import lombok.Getter;
 
 import java.io.File;
 import java.util.*;
 
-public class WarpManager {
+@Getter
+public class WarpService {
 
     private final Map<String, Map<String, List<Double>>> warps = new HashMap<>();
     private final Config config;
 
-    public WarpManager(File dataFolder) {
+    public WarpService(File dataFolder) {
         this.config = new Config(new File(dataFolder, "warps.yml"), Config.YAML);
         loadWarps();
     }

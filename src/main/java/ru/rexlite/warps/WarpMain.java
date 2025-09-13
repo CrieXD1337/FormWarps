@@ -24,34 +24,38 @@
 
 package ru.rexlite.warps;
 
-import cn.nukkit.event.Listener;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
-import ru.rexlite.warps.commands.DelWarpCommand;
-import ru.rexlite.warps.commands.SetWarpCommand;
-import ru.rexlite.warps.commands.WarpCommand;
-import ru.rexlite.warps.commands.WarpsCommand;
-import ru.rexlite.warps.forms.WarpFormHandler;
-import ru.rexlite.warps.managers.ConfigManager;
-import ru.rexlite.warps.managers.WarpManager;
+import lombok.Getter;
+import ru.rexlite.warps.command.DelWarpCommand;
+import ru.rexlite.warps.command.SetWarpCommand;
+import ru.rexlite.warps.command.WarpCommand;
+import ru.rexlite.warps.command.WarpsCommand;
+import ru.rexlite.warps.form.WarpFormHandler;
+import ru.rexlite.warps.listener.FormResponseListener;
+import ru.rexlite.warps.service.ConfigService;
+import ru.rexlite.warps.service.WarpService;
 
-public class WarpMain extends PluginBase implements Listener {
+public class WarpMain extends PluginBase {
 
-    public static WarpManager warpManager;
-    public static WarpFormHandler formHandler;
-    public static ConfigManager configManager;
+    @Getter
     private static WarpMain instance;
+    @Getter
+    public static WarpService warpService;
+    @Getter
+    public static WarpFormHandler formHandler;
+    @Getter
+    public static ConfigService configService;
 
     @Override
     public void onEnable() {
         instance = this;
         this.getDataFolder().mkdirs();
-        warpManager = new WarpManager(getDataFolder());
-        configManager = new ConfigManager(this);
+        warpService = new WarpService(getDataFolder());
+        configService = new ConfigService(this);
         formHandler = new WarpFormHandler(this);
-        getServer().getPluginManager().registerEvents(formHandler, this);
+        getServer().getPluginManager().registerEvents(new FormResponseListener(), this);
 
-        // Register commands
         registerCommands();
 
         this.getLogger().info(" ");
@@ -61,13 +65,9 @@ public class WarpMain extends PluginBase implements Listener {
     }
 
     private void registerCommands() {
-        getServer().getCommandMap().register("formwarps", new SetWarpCommand(configManager.commandConfigs.get("setwarp")));
-        getServer().getCommandMap().register("formwarps", new DelWarpCommand(configManager.commandConfigs.get("delwarp")));
-        getServer().getCommandMap().register("formwarps", new WarpCommand(configManager.commandConfigs.get("warp")));
-        getServer().getCommandMap().register("formwarps", new WarpsCommand(configManager.commandConfigs.get("warps")));
-    }
-
-    public static WarpMain getInstance() {
-        return instance;
+        getServer().getCommandMap().register("formwarps", new SetWarpCommand(configService.getCommandConfig("setwarp")));
+        getServer().getCommandMap().register("formwarps", new DelWarpCommand(configService.getCommandConfig("delwarp")));
+        getServer().getCommandMap().register("formwarps", new WarpCommand(configService.getCommandConfig("warp")));
+        getServer().getCommandMap().register("formwarps", new WarpsCommand(configService.getCommandConfig("warps")));
     }
 }
